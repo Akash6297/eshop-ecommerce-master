@@ -1,34 +1,39 @@
+// Contact.js
+
 import { useRef } from "react";
 import Card from "../../components/card/Card";
 import styles from "./Contact.module.scss";
 import { FaPhoneAlt, FaEnvelope, FaTwitter } from "react-icons/fa";
 import { GoLocation } from "react-icons/go";
-import emailjs from "@emailjs/browser";
 import { toast } from "react-toastify";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../../firebase/config";
 
 const Contact = () => {
   const form = useRef();
 
-  const sendEmail = (e) => {
+  const sendEmail = async (e) => {
     e.preventDefault();
-    console.log(form.current);
 
-    emailjs
-      .sendForm(
-        process.env.REACT_APP_EMAILJS_SERVICE_ID,
-        "template_7xyhwen",
-        form.current,
-        "user_hKs2aRfLoozcqA28UpUyz"
-      )
-      .then(
-        (result) => {
-          toast.success("Message sent successfully");
-        },
-        (error) => {
-          toast.error(error.text);
-        }
-      );
-    e.target.reset();
+    // Extract form data
+    const formData = new FormData(form.current);
+    const data = {};
+    formData.forEach((value, key) => {
+      data[key] = value;
+    });
+
+    try {
+      // Store form data in Firebase
+      const docRef = await addDoc(collection(db, "contactForms"), data);
+      console.log("Document written with ID: ", docRef.id);
+      toast.success("Message sent successfully");
+
+      // Optionally, you can clear the form fields here
+      e.target.reset();
+    } catch (error) {
+      console.error("Error storing message in Firebase:", error);
+      toast.error("Error storing message in Firebase");
+    }
   };
 
   return (
@@ -38,30 +43,35 @@ const Contact = () => {
         <div className={styles.section}>
           <form ref={form} onSubmit={sendEmail}>
             <Card cardClass={styles.card}>
-              <label>Name</label>
+              <label htmlFor="user_name">Name</label>
               <input
                 type="text"
+                id="user_name"
                 name="user_name"
                 placeholder="Full Name"
                 required
               />
-              <label>Email</label>
+              <label htmlFor="user_email">Email</label>
               <input
                 type="email"
+                id="user_email"
                 name="user_email"
                 placeholder="Your active email"
                 required
               />
-              <label>Subject</label>
+              <label htmlFor="subject">Subject</label>
               <input
                 type="text"
+                id="subject"
                 name="subject"
                 placeholder="Subject"
                 required
               />
-              <label>Message</label>
-              <textarea name="message" cols="30" rows="10"></textarea>
-              <button className="--btn --btn-primary">Send Message</button>
+              <label htmlFor="message">Message</label>
+              <textarea id="message" name="message" cols="30" rows="10"></textarea>
+              <button type="submit" className="--btn --btn-primary">
+                Send Message
+              </button>
             </Card>
           </form>
 

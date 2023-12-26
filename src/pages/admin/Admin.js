@@ -8,6 +8,7 @@ import Orders from "../../components/admin/orders/Orders";
 import ViewProducts from "../../components/admin/viewProducts/ViewProducts";
 
 import styles from "./Admin.module.scss";
+import ContactMessages from "../../components/admin/ContactMessages/ContactMessages";
 
 const Admin = () => {
   return (
@@ -21,6 +22,7 @@ const Admin = () => {
           <Route path="all-products" element={<ViewProducts />} />
           <Route path="add-product/:id" element={<AddProduct />} />
           <Route path="orders" element={<Orders />} />
+          <Route path="contact-messages" element={<ContactMessages />} />
           <Route path="order-details/:id" element={<OrderDetails />} />
         </Routes>
       </div>
