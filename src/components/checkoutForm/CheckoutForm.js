@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  PaymentElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
+import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import styles from "./CheckoutForm.module.scss";
 import Card from "../card/Card";
 import CheckoutSummary from "../checkoutSummary/CheckoutSummary";
@@ -11,11 +7,7 @@ import spinnerImg from "../../assets/spinner.jpg";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { selectEmail, selectUserID } from "../../redux/slice/authSlice";
-import {
-  CLEAR_CART,
-  selectCartItems,
-  selectCartTotalAmount,
-} from "../../redux/slice/cartSlice";
+import { CLEAR_CART, selectCartItems, selectCartTotalAmount } from "../../redux/slice/cartSlice";
 import { selectShippingAddress } from "../../redux/slice/checkoutSlice";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { db } from "../../firebase/config";
@@ -51,7 +43,7 @@ const CheckoutForm = () => {
   }, [stripe]);
 
   // Save order to Order History
-  const saveOrder = () => {
+  const saveOrder = async () => {
     const today = new Date();
     const date = today.toDateString();
     const time = today.toLocaleTimeString();
@@ -66,11 +58,12 @@ const CheckoutForm = () => {
       shippingAddress,
       createdAt: Timestamp.now().toDate(),
     };
+
     try {
-      addDoc(collection(db, "orders"), orderConfig);
+      const docRef = await addDoc(collection(db, "orders"), orderConfig);
       dispatch(CLEAR_CART());
       toast.success("Order saved");
-      navigate("/checkout-success");
+      navigate(`/checkout-success?orderId=${docRef.id}`);
     } catch (error) {
       toast.error(error.message);
     }
@@ -86,32 +79,39 @@ const CheckoutForm = () => {
 
     setIsLoading(true);
 
-    const confirmPayment = await stripe
-      .confirmPayment({
+    try {
+      // Create PaymentMethod
+      const paymentMethod = await stripe.createPaymentMethod({
+        type: "card",
+        card: elements.getElement(PaymentElement),
+      });
+
+      // Confirm the PaymentIntent with the payment method
+      const result = await stripe.confirmPayment({
+        payment_method: paymentMethod.paymentMethod.id,
         elements,
         confirmParams: {
           // Make sure to change this to your payment completion page
           return_url: "https://eshop-f9982.web.app/checkout-success",
         },
         redirect: "if_required",
-      })
-      .then((result) => {
-        // ok - paymentIntent // bad - error
-        if (result.error) {
-          toast.error(result.error.message);
-          setMessage(result.error.message);
-          return;
-        }
-        if (result.paymentIntent) {
-          if (result.paymentIntent.status === "succeeded") {
-            setIsLoading(false);
-            toast.success("Payment successful");
-            saveOrder();
-          }
-        }
       });
 
-    setIsLoading(false);
+      // Check the payment result
+      if (result.error) {
+        toast.error(result.error.message);
+        setMessage(result.error.message);
+      } else if (result.paymentIntent && result.paymentIntent.status === "succeeded") {
+        setIsLoading(false);
+        toast.success("Payment successful");
+        saveOrder();
+      }
+    } catch (error) {
+      toast.error(error.message);
+      setMessage(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

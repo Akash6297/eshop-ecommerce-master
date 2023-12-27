@@ -119,7 +119,7 @@ const CheckoutDetails = () => {
               {/* COUNTRY INPUT */}
               <CountryDropdown
                 className={styles.select}
-                valueType="short"
+                valueType="full"
                 value={shippingAddress.country}
                 onChange={(val) =>
                   handleShipping({
@@ -199,7 +199,7 @@ const CheckoutDetails = () => {
               {/* COUNTRY INPUT */}
               <CountryDropdown
                 className={styles.select}
-                valueType="short"
+                valueType="full"
                 value={billingAddress.country}
                 onChange={(val) =>
                   handleBilling({

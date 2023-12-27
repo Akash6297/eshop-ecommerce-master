@@ -35,23 +35,25 @@ const Checkout = () => {
     dispatch(CALCULATE_TOTAL_QUANTITY());
   }, [dispatch, cartItems]);
 
-  const description = `eShop payment: email: ${customerEmail}, Amount: ${totalAmount}`;
+  // const description = `eShop payment: email: ${customerEmail}, Amount: ${totalAmount}`;
+  const description = `eShop payment: Amount: ${totalAmount}`;
+
 
   useEffect(() => {
     // http://localhost:4242/create-payment-intent
     // Create PaymentIntent as soon as the page loads
-    // fetch("https://eshop-react-firebase.herokuapp.com/create-payment-intent", {
-    fetch("http://localhost:4242/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        items: cartItems,
-        userEmail: customerEmail,
-        shipping: shippingAddress,
-        billing: billingAddress,
-        description,
-      }),
-    })
+    fetch("https://eshop-ecom.onrender.com/create-payment-intent", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    items: cartItems,
+    userEmail: customerEmail,
+    shipping: shippingAddress,
+    billing: billingAddress,
+    description,
+    currency: "inr", // Set the currency to INR
+  }),
+})
       .then((res) => {
         if (res.ok) {
           return res.json();

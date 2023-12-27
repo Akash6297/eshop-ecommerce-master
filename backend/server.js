@@ -39,7 +39,7 @@ app.post("/create-payment-intent", async (req, res) => {
   // Create a PaymentIntent with the order amount and currency
   const paymentIntent = await stripe.paymentIntents.create({
     amount: calculateOrderAmount(items),
-    currency: "usd",
+    currency: "inr",
     automatic_payment_methods: {
       enabled: true,
     },
@@ -63,5 +63,5 @@ app.post("/create-payment-intent", async (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 4242;
+const PORT = process.env.PORT || 4243;
 app.listen(PORT, () => console.log(`Node server listening on port ${PORT}`));
