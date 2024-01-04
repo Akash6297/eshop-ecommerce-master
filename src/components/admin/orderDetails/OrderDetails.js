@@ -44,6 +44,8 @@ const OrderDetails = () => {
               State: {order.shippingAddress.state}
               <br />
               Country: {order.shippingAddress.country}
+              <br />
+              PIN CODE: {order.shippingAddress.postal_code}
             </p>
             <br />
             <table>
