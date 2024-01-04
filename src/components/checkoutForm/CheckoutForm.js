@@ -86,6 +86,7 @@ const CheckoutForm = () => {
 
     setIsLoading(true);
 
+    // eslint-disable-next-line no-unused-vars
     const confirmPayment = await stripe
       .confirmPayment({
         elements,
