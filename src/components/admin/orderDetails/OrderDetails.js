@@ -30,13 +30,17 @@ const OrderDetails = () => {
               <b>Order ID</b> {order.id}
             </p>
             <p>
-              <b>Order Amount</b> ${order.orderAmount}
+              <b>Order Amount</b> ₹{order.orderAmount}
             </p>
             <p>
               <b>Order Status</b> {order.orderStatus}
             </p>
             <p>
               <b>Shipping Address</b>
+              <br />
+              Name: {order.shippingAddress.name}
+              <br />
+              Phone: {order.shippingAddress.phone}
               <br />
               Address: {order.shippingAddress.line1},
               {order.shippingAddress.line2}, {order.shippingAddress.city}
